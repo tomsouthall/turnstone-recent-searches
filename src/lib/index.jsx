@@ -1,19 +1,53 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-
-export default function HelloWorld(props) {
+const recentSearchesPlugin = (Component, componentProps = {}, pluginProps = {}) => {
   const {
-    greetee = 'World'
-  } = props
+    ratio = 1,
+    id,
+    name = 'Recent Searches',
+    storageKey = 'recentSearches',
+    limit = 10
+  } = pluginProps
 
-  return (
-    <div>Hello, {greetee}!</div>
-  )
+  const {
+    defaultListbox = []
+  } = componentProps
+
+  const recentSearches = () => {
+    return JSON.parse(localStorage.getItem(storageKey)) || []
+  }
+
+  const addToRecentSearches = itemToAdd => {
+    const searches = [
+      itemToAdd,
+      ...recentSearches().filter(
+        item => item._displayField !== itemToAdd._displayField
+      )
+    ]
+    localStorage.setItem(storageKey, JSON.stringify(searches.slice(0, limit)))
+  }
+
+  const buildDefaultListBox = (recentSearches) => {
+    return [
+      {id, name, displayField: '_displayField', data: recentSearches, ratio},
+      ...defaultListbox
+    ]
+  }
+
+  const onSelect = (selectedResult, displayField) => {
+    if(selectedResult) {
+      selectedResult._displayField = selectedResult[displayField]
+      addToRecentSearches(selectedResult)
+    }
+
+    if(typeof componentProps.onSelect === 'function')
+      componentProps.onSelect(selectedResult, displayField)
+  }
+
+  const newComponentProps = {
+    ...componentProps,
+    ...{defaultListbox: buildDefaultListBox(recentSearches()), onSelect}
+  }
+
+  return [Component, newComponentProps]
 }
 
-// See more about PropType validation here:
-// https://reactjs.org/docs/typechecking-with-proptypes.html
-
-HelloWorld.propTypes = {
-  greetee: PropTypes.string
-}
+export default recentSearchesPlugin

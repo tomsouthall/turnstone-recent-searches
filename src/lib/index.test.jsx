@@ -1,26 +1,106 @@
 import React from 'react'
-import renderer from 'react-test-renderer'
-import { describe, expect, test } from 'vitest'
-import HelloWorld from './index'
+import { describe, expect, test, beforeEach, afterAll } from 'vitest'
+import { shallow, configure } from 'enzyme'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import recentSearchesPlugin from './index'
 
-describe('HelloWorld', () => {
-  test('HelloWorld component renders correctly', () => {
-    const component = renderer.create(
-      <HelloWorld />
+configure({ adapter: new Adapter() })
+
+describe('Turnstone Recent Searches Plugin', () => {
+  const clearLocalStorage = () => {
+    localStorage.clear()
+  }
+
+  beforeEach(clearLocalStorage)
+  afterAll(clearLocalStorage)
+
+  test('Basic no props test', () => {
+    const App = () => {
+      const Container = () => <div>Foobar</div>
+      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(Container)
+      return <ContainerWithPlugin {...containerProps} />
+    }
+
+    const wrapper = shallow(
+      <App />
     )
 
-    const tree = component.toJSON()
-
-    expect(tree).toMatchSnapshot()
+    expect(wrapper).not.toBeNull()
+    expect(Array.isArray(wrapper.prop('defaultListbox'))).toBe(true)
+    expect(typeof wrapper.prop('onSelect')).toBe('function')
   })
 
-  test('The greetee prop works', () => {
-    const component = renderer.create(
-      <HelloWorld greetee={'Universe'} />
+  test('Selected item is saved to localStorage', () => {
+    const App = (props) => {
+      const Container = ({onSelect}) => {
+        if(onSelect) onSelect({name: 'foo'}, 'name')
+        return <div>Foobar</div>
+      }
+      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(Container, props, {id: 'foobar', name: 'Recent'})
+      return <ContainerWithPlugin {...containerProps} />
+    }
+
+    const wrapper = shallow(
+      <App onSelect={() => null} />
     )
 
-    const tree = component.toJSON()
+    expect(wrapper.prop('defaultListbox')).toEqual([
+      {
+        id: 'foobar',
+        name: 'Recent',
+        displayField: '_displayField',
+        data: [],
+        ratio: 1
+      }
+    ])
+    expect(typeof wrapper.prop('onSelect')).toBe('function')
+    wrapper.render()
+    expect(localStorage.getItem('recentSearches')).toEqual(JSON.stringify([{
+      name: 'foo',
+      _displayField: 'foo'
+    }]))
 
-    expect(tree).toMatchSnapshot()
+    const wrapper2 = shallow(
+      <App />
+    )
+
+    expect(wrapper2.prop('defaultListbox')).toEqual([
+      {
+        id: 'foobar',
+        name: 'Recent',
+        displayField: '_displayField',
+        data: [{
+          name: 'foo',
+          _displayField: 'foo'
+        }],
+        ratio: 1
+      }
+    ])
+  })
+
+  test('Stored items are limited', () => {
+    const App = (props) => {
+      const Container = ({onSelect}) => {
+        if(onSelect) {
+          onSelect({name: 'foo'}, 'name')
+          onSelect({name: 'bar'}, 'name')
+          onSelect({name: 'foobar'}, 'name')
+        }
+        return <div>Foobar</div>
+      }
+      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(
+        Container, props, { limit: 2 }
+      )
+      return <ContainerWithPlugin {...containerProps} />
+    }
+
+    const wrapper = shallow(
+      <App onSelect={() => null} />
+    )
+    wrapper.render()
+    expect(localStorage.getItem('recentSearches')).toEqual(JSON.stringify([
+      {name: 'foobar', _displayField: 'foobar'},
+      {name: 'bar', _displayField: 'bar'}
+    ]))
   })
 })
