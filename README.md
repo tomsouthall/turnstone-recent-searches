@@ -1,43 +1,65 @@
-# react-library-vite
+# turnstone-recent-searches
 
-This repository accompanies the blog entry [Publishing a React component to npm using Vite](https://tomsouthall.com/blog/publishing-react-component-using-vite/).
+In development
 
-This is a scaffold application for building a React library/component using Vite, that can be published to npm.
+<!-- This is a plugin for the Turnstone autocomplete component.
 
-Feel free to clone this repository. Simply replace all instances of `react-library-vite` in `/package.json` and in `/vite.config.js` with the name of your npm package.
+It displays the user's most recent searches when the search input receives focus and before
+any value is entered.
 
-Replace `version`, `description` and `author` in `/package.json`.
+## Installation
 
-## To run in development
+To install:
 
 ```bash
-npm run dev
+$ npm install turnstone turnstone-recent-searches
 ```
 
-## To run tests
+## Usage
 
-```bash
-npm test
-```
+```jsx
+import React from 'react'
+import Turnstone from 'turnstone'
+import recentSearchesPlugin from 'turnstone-recent-searches'
+import { fruits, vegetables } from './data'
 
-or
+const listbox = [
+  {
+    data: fruits,
+    searchType: 'startswith',
+    name: 'Fruits'
+  },
+  {
+    data: vegetables,
+    searchType: 'contains',
+    name: 'Vegetables'
+  }
+]
 
-```bash
-npm run watch
-```
+const plugins = [
+  [
+    recentSearchesPlugin,
+    {
+      name: 'Recent'
+    }
+  ]
+]
 
-## To build and publish
+const App = () => {
+  return (
+    <Turnstone
+      clearButton={true}
+      listbox={listbox}
+      listboxIsImmutable={true}
+      placeholder="Type something fruity"
+      plugins={plugins}
+    />
+  )
+}
 
-```bash
-npm run build
-```
-
-followed by
-
-```bash
-npm publish
+export default App
 ```
 
 ## License
 
-MIT © [tomsouthall](https://github.com/tomsouthall)
+MIT © [tomsouthall](https://github.com/tomsouthall) -->
