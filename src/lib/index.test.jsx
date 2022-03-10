@@ -49,7 +49,7 @@ describe('Turnstone Recent Searches Plugin', () => {
         id: 'foobar',
         name: 'Recent',
         displayField: '_displayField',
-        data: [],
+        data: expect.any(Function),
         ratio: 1
       }
     ])
@@ -69,10 +69,7 @@ describe('Turnstone Recent Searches Plugin', () => {
         id: 'foobar',
         name: 'Recent',
         displayField: '_displayField',
-        data: [{
-          name: 'foo',
-          _displayField: 'foo'
-        }],
+        data: expect.any(Function),
         ratio: 1
       }
     ])
