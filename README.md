@@ -51,7 +51,7 @@ export default App
 
 Note that if you are already passing a `defaultListbox` prop, the recent searches will be added as the first group and can be specified with a `ratio` value etc, just like any other group.
 
-The `defaultListboxIsImmutable` prop will be set to `false` given that recently selected items chnage upon each user selection.
+The `defaultListboxIsImmutable` prop will be set to `false` given that recently selected items change upon each user selection.
 
 The following is an example of a `defaultListbox` prop being supplied alongside the recent searches plugin. Here, ideally the recent searches will take up to 6 of the 10 available slots and the popular items will take up 4.
 
