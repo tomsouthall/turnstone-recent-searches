@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/lib/index.jsx'),
-      name: 'Turnstone Recent Searches',
+      name: 'turnstone-recent-searches',
       fileName: (format) => `turnstone-recent-searches.${format}.js`
     },
     rollupOptions: {
