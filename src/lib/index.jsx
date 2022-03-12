@@ -1,21 +1,29 @@
-const recentSearchesPlugin = (Component, componentProps = {}, pluginProps = {}) => {
+import { useCallback } from 'react'
+
+const RecentSearchesPlugin = (props) => {
   const {
+    Component,
+    componentProps,
+    pluginIndex,
+    render,
     ratio = 1,
     id,
     name = 'Recent Searches',
     storageKey = 'recentSearches',
     limit = 10
-  } = pluginProps
+  } = props
 
   const {
-    defaultListbox = []
+    plugins,
+    defaultListbox = [],
+    onSelect
   } = componentProps
 
-  const recentSearches = () => {
+  const recentSearches = useCallback(() => {
     return JSON.parse(localStorage.getItem(storageKey)) || []
-  }
+  }, [storageKey])
 
-  const addToRecentSearches = itemToAdd => {
+  const addToRecentSearches = useCallback(itemToAdd => {
     const searches = [
       itemToAdd,
       ...recentSearches().filter(
@@ -23,7 +31,7 @@ const recentSearchesPlugin = (Component, componentProps = {}, pluginProps = {}) 
       )
     ]
     localStorage.setItem(storageKey, JSON.stringify(searches.slice(0, limit)))
-  }
+  }, [storageKey, limit, recentSearches, ])
 
   const buildDefaultListBox = () => {
     return  [
@@ -38,10 +46,10 @@ const recentSearchesPlugin = (Component, componentProps = {}, pluginProps = {}) 
     ]
   }
 
-  const onSelect = (selectedResult, displayField) => {
+  const handleSelect = useCallback((selectedResult, displayField) => {
     if(selectedResult) {
       if(typeof selectedResult === 'string') {
-        selectedResult = { _displayField: selectedResult }
+        selectedResult = {_displayField: selectedResult}
       }
       else {
         selectedResult._displayField = selectedResult[displayField]
@@ -49,20 +57,17 @@ const recentSearchesPlugin = (Component, componentProps = {}, pluginProps = {}) 
       addToRecentSearches(selectedResult)
     }
 
-    if(typeof componentProps.onSelect === 'function')
-      componentProps.onSelect(selectedResult, displayField)
-  }
+    if(typeof onSelect === 'function') onSelect(selectedResult, displayField)
+  }, [addToRecentSearches, onSelect])
 
   const newComponentProps = {
     ...componentProps,
-    ...{
-      defaultListbox: buildDefaultListBox(),
-      defaultListboxIsImmutable: false,
-      onSelect
-    }
+    defaultListbox: buildDefaultListBox(),
+    defaultListboxIsImmutable: false,
+    onSelect: handleSelect
   }
 
-  return [Component, newComponentProps]
+  return render(Component, newComponentProps, plugins, pluginIndex)
 }
 
-export default recentSearchesPlugin
+export default RecentSearchesPlugin
