@@ -2,7 +2,8 @@ import React from 'react'
 import { describe, expect, test, beforeEach, afterAll } from 'vitest'
 import { shallow, configure } from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import recentSearchesPlugin from './index'
+import RecentSearchesPlugin from './index'
+import render from '../render'
 
 configure({ adapter: new Adapter() })
 
@@ -17,13 +18,13 @@ describe('Turnstone Recent Searches Plugin', () => {
   test('Basic no props test', () => {
     const App = () => {
       const Container = () => <div>Foobar</div>
-      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(Container)
-      return <ContainerWithPlugin {...containerProps} />
+      const componentProps = {plugins: [RecentSearchesPlugin]}
+
+      return render(Container, componentProps, 0)
     }
 
-    const wrapper = shallow(
-      <App />
-    )
+    const hoc = shallow(<App />)
+    const wrapper = shallow(hoc.get(0))
 
     expect(wrapper).not.toBeNull()
     expect(Array.isArray(wrapper.prop('defaultListbox'))).toBe(true)
@@ -31,18 +32,22 @@ describe('Turnstone Recent Searches Plugin', () => {
   })
 
   test('Selected item is saved to localStorage', () => {
-    const App = (props) => {
+    const App = () => {
       const Container = ({onSelect}) => {
         if(onSelect) onSelect({name: 'foo'}, 'name')
         return <div>Foobar</div>
       }
-      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(Container, props, {id: 'foobar', name: 'Recent'})
-      return <ContainerWithPlugin {...containerProps} />
+      const plugins = [[RecentSearchesPlugin, {id: 'foobar', name: 'Recent'}]]
+      const componentProps = {
+        plugins,
+        onSelect: () => null
+      }
+
+      return render(Container, componentProps, 0)
     }
 
-    const wrapper = shallow(
-      <App onSelect={() => null} />
-    )
+    const hoc = shallow(<App />)
+    const wrapper = shallow(hoc.get(0))
 
     expect(wrapper.prop('defaultListbox')).toEqual([
       {
@@ -60,9 +65,8 @@ describe('Turnstone Recent Searches Plugin', () => {
       _displayField: 'foo'
     }]))
 
-    const wrapper2 = shallow(
-      <App />
-    )
+    const hoc2 = shallow(<App />)
+    const wrapper2 = shallow(hoc2.get(0))
 
     expect(wrapper2.prop('defaultListbox')).toEqual([
       {
@@ -76,7 +80,7 @@ describe('Turnstone Recent Searches Plugin', () => {
   })
 
   test('Stored items are limited', () => {
-    const App = (props) => {
+    const App = () => {
       const Container = ({onSelect}) => {
         if(onSelect) {
           onSelect({name: 'foo'}, 'name')
@@ -85,15 +89,18 @@ describe('Turnstone Recent Searches Plugin', () => {
         }
         return <div>Foobar</div>
       }
-      const [ContainerWithPlugin, containerProps] = recentSearchesPlugin(
-        Container, props, { limit: 2 }
-      )
-      return <ContainerWithPlugin {...containerProps} />
+      const plugins = [[RecentSearchesPlugin, {limit: 2}]]
+      const componentProps = {
+        plugins,
+        onSelect: () => null
+      }
+
+      return render(Container, componentProps, 0)
     }
 
-    const wrapper = shallow(
-      <App onSelect={() => null} />
-    )
+    const hoc = shallow(<App />)
+    const wrapper = shallow(hoc.get(0))
+
     wrapper.render()
     expect(localStorage.getItem('recentSearches')).toEqual(JSON.stringify([
       {name: 'foobar', _displayField: 'foobar'},

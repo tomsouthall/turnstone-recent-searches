@@ -1,18 +1,12 @@
 import React from 'react'
-import recentSearchesPlugin from './lib'
+import RecentSearchesPlugin from './lib'
+import render from './render'
 
 const App = () => {
-  const Container = () => {
-    return (<div>Foobar</div>)
-  }
+  const Container = () => <div>Foobar</div>
+  const componentProps = {plugins: [RecentSearchesPlugin]}
 
-  const r = recentSearchesPlugin(Container)
-  const ContainerWithPlugin = r[0]
-  const containerProps = r[1]
-
-  return (
-    <ContainerWithPlugin {...containerProps} />
-  )
+  return render(Container, componentProps, [RecentSearchesPlugin], 0)
 }
 
 export default App
