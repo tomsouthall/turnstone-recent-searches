@@ -1,6 +1,6 @@
 # turnstone-recent-searches
 
-This is a plugin for the Turnstone autocomplete component.
+This is a plugin for the [Turnstone autocomplete component](https://github.com/tomsouthall/turnstone).
 
 It displays the user's most recent searches when the search input receives focus and before
 any value is entered.
