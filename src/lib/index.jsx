@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 
-const RecentSearchesPlugin = (props) => {
+const RecentSearchesPlugin = React.forwardRef((props, ref) => {
   const {
     Component,
     componentProps,
@@ -66,7 +66,9 @@ const RecentSearchesPlugin = (props) => {
     onSelect: handleSelect
   }
 
-  return render(Component, newComponentProps, pluginIndex + 1)
-}
+  return render(Component, newComponentProps, pluginIndex + 1, ref)
+})
+
+RecentSearchesPlugin.displayName = 'RecentSearchesPlugin'
 
 export default RecentSearchesPlugin

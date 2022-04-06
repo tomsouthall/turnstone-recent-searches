@@ -1,6 +1,6 @@
 {
   "name": "turnstone-recent-searches",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A plugin for the Turnstone React component. Display Recent Searches in the default listbox.",
   "author": "Tom Southall",
   "keywords": ["turnstone", "react", "autocomplete", "autosuggest", "dropdown", "recent searches"],
